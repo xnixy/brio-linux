@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+export PYBUILD_NAME=brio-control
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	$(MAKE) install-data DESTDIR=$(CURDIR)/debian/brio-control PREFIX=/usr
+
+override_dh_auto_test:
+	python3 -m unittest discover -s . -p "test_*.py" -t .

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brio-control"
+version = "0.1.0"
+description = "Logitech BRIO controls for Linux (G HUB feature parity): HDR, FOV, 4K, profiles"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.11"
+# PyGObject, GTK 4, libadwaita, GStreamer (+ gst-plugin-gtk4) and GUdev come from
+# the distribution; they are not installable from PyPI in a useful way.
+dependencies = []
+
+[project.scripts]
+briod = "briod.daemon:main"
+brio-ctl = "briod.ctl:main"
+brio-probe = "briod.probe:main"
+brio-import-ghub = "briod.import_cli:main"
+
+[project.gui-scripts]
+brio-control = "brio_control.main:main"
+
+[tool.setuptools]
+packages = ["briod", "briod.models", "brio_control"]

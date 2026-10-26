@@ -1,0 +1,30 @@
+# Maintainer: BRIO Control contributors
+pkgname=brio-control
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Logitech BRIO controls for Linux: HDR, field of view, zoom, exposure, profiles (G HUB parity)"
+arch=('any')
+url="https://example.invalid/brio-control"
+license=('GPL-3.0-or-later')
+depends=('python' 'python-gobject' 'gtk4' 'libadwaita' 'libgudev'
+         'gstreamer' 'gst-plugins-base' 'gst-plugins-good' 'gst-plugin-gtk4')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
+optdepends=('v4l-utils: inspecting the camera from the command line')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "$pkgname-$pkgver"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  python -m unittest discover -s . -p "test_*.py" -t .
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  make install-data DESTDIR="$pkgdir" PREFIX=/usr
+}

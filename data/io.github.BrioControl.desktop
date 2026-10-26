@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=BRIO Control
+GenericName=Webcam Settings
+Comment=Configure the Logitech BRIO: HDR, field of view, zoom, exposure and profiles
+Exec=brio-control
+Icon=io.github.BrioControl
+Terminal=false
+Categories=AudioVideo;Video;Settings;HardwareSettings;GTK;
+Keywords=webcam;camera;logitech;brio;hdr;fov;zoom;
+StartupNotify=true
+DBusActivatable=false

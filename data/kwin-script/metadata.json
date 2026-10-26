@@ -1,0 +1,11 @@
+{
+    "KPlugin": {
+        "Id": "brio-control-focus",
+        "Name": "BRIO Control focus helper",
+        "Description": "Tells briod which window is focused for per-app camera profiles",
+        "License": "GPL-3.0-or-later"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}

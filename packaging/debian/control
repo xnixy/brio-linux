@@ -1,0 +1,18 @@
+Source: brio-control
+Section: video
+Priority: optional
+Maintainer: BRIO Control contributors <noreply@example.invalid>
+Build-Depends: debhelper-compat (= 13), dh-python, python3-all, python3-setuptools, pybuild-plugin-pyproject
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: brio-control
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends},
+ python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-gudev-1.0, gir1.2-gstreamer-1.0,
+ gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-gtk4
+Suggests: v4l-utils
+Description: Logitech BRIO controls for Linux (HDR, FOV, zoom, profiles)
+ GTK4/libadwaita app plus a user daemon (briod) that apply every setting
+ Logitech G HUB offers for the BRIO webcam, including HDR, the 90/78/65 degree
+ field of view, presets and per-app profiles.

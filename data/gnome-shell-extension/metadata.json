@@ -1,0 +1,6 @@
+{
+  "uuid": "brio-control-focus@briocontrol.github.io",
+  "name": "BRIO Control focus helper",
+  "description": "Tells briod which app is focused so BRIO Control can switch camera profiles by focused window.",
+  "shell-version": ["45", "46", "47", "48", "49"]
+}

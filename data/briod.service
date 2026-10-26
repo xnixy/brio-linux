@@ -1,0 +1,15 @@
+[Unit]
+Description=Logitech BRIO control daemon (applies camera profiles)
+Documentation=file:///usr/share/doc/brio-control/README.md
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=io.github.BrioControl.Daemon
+ExecStart=/usr/bin/briod
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target
