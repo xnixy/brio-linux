@@ -21,11 +21,18 @@ class Camera:
         self.ctrls = self.dev.query_controls()
         self.caps = {n: {"minimum": c.minimum, "maximum": c.maximum, "step": c.step,
                          "default": c.default, "menu": c.menu} for n, c in self.ctrls.items()}
+        # MX Brio exposes standard UVC controls, but its proprietary selectors
+        # and the original BRIO HDR mapping have not been verified.
+        self.standard_only = info.pid == "0944"
+        if self.standard_only:
+            self.caps.pop("backlight_compensation", None)
         self.xu = {
             "fov": self.dev.xu_unit_for(brio.XU_VIDEOPIPE),
             "mic": self.dev.xu_unit_for(brio.XU_PERIPHERAL),
             "info": self.dev.xu_unit_for(brio.XU_DEVICEINFO),
         }
+        if self.standard_only:
+            self.xu = dict.fromkeys(self.xu)
         self.firmware = ""
         if self.xu["info"] is not None:
             try:
@@ -59,7 +66,10 @@ class Camera:
         """G HUB resolution list filtered by what the camera enumerates."""
         out = []
         for rid, label, w, h, fps in brio.RESOLUTIONS:
-            for fmt in ("MJPG", "YUYV"):
+            # MX Brio MJPEG reports inconsistent buffer sizes on some kernels.
+            # Prefer its working raw capture path where the mode offers it.
+            formats = ("YUYV", "MJPG") if self.standard_only else ("MJPG", "YUYV")
+            for fmt in formats:
                 f = next((f for f in self.formats if f["fourcc"] == fmt), None)
                 if not f:
                     continue
@@ -95,7 +105,8 @@ class Camera:
         writes = []
         for tab in APPLY_ORDER:
             if tab in tabs and tab in settings:
-                writes += brio.plan_writes(tab, settings[tab], self.caps)
+                planned = brio.plan_writes(tab, settings[tab], self.caps)
+                writes += [w for w in planned if not self.standard_only or w[0] == "v4l2"]
         if device_settings is not None:
             af = device_settings.get("antiFlicker")
             if af in brio.ANTI_FLICKER and "power_line_frequency" in self.caps:

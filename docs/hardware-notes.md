@@ -33,3 +33,47 @@ rejects the value with EACCES while the auto control is on.
 
 Other extension-unit selectors (units 6 and 9) are firmware/debug controls and
 are never written.
+
+## MX Brio (046d:0944)
+
+Observed on 2026-11-13 with Ubuntu, kernel 7.0.0-42-generic and GStreamer
+1.28.2. This is a different model from the original BRIO (046d:085e).
+Linux enumerated /dev/video0 and /dev/video1; /dev/video0 was used for capture.
+
+The camera exposes standard UVC controls for brightness, contrast, saturation,
+sharpness, automatic/manual white balance, gain, anti-flicker, backlight
+compensation, automatic/manual exposure, dynamic frame rate, pan, tilt and
+automatic/manual focus and zoom. Notable reported ranges:
+
+| Control | Range |
+|---|---|
+| Pan / tilt | ±72000, step 3600 |
+| Zoom | 100–400, step 1 |
+| Manual exposure | 3–2047, step 1 |
+| White balance temperature | 2800–7500 K |
+| Gain / manual focus | 0–255, step 1 |
+
+Discovery now accepts 0944. Standard controls use the existing UVC path, but
+individual control effects have not all been verified on hardware. Exposure
+presets and ISO labels retain the original BRIO conversions; they are not
+calibrated MX Brio measurements. Original-BRIO proprietary FOV, microphone and
+firmware selectors are disabled for this model. The original BRIO mapping of
+backlight compensation to HDR is also disabled pending verification.
+
+### Preview findings
+
+At 1280×720, 30 fps, direct V4L2 MJPEG capture using v4l2-ctl successfully
+captured 60 frames. The equivalent GStreamer mmap pipeline failed: the driver
+provided 1,092,266-byte buffers while GStreamer expected 1,638,400 bytes.
+The resulting “Failed to allocate required memory” message was a buffer-size
+mismatch, not evidence of exhausted system RAM.
+
+GStreamer USERPTR failed because the JPEG pipeline supplied no downstream
+buffer pool to import. Read/write capture was unsupported by the driver.
+GStreamer mmap capture using YUYV at 1280×720, 30 fps successfully captured
+60 frames, and the user subsequently confirmed the GUI preview worked.
+
+MX Brio preview therefore prefers YUYV where the selected mode offers it.
+MJPEG-only modes remain unverified and may encounter the same failure.
+Preview errors no longer trigger continuous retries; toggling preview or
+changing the device/mode permits another attempt.

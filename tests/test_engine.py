@@ -1,7 +1,9 @@
 import errno
 import unittest
 
-from briod.engine import drift
+from briod.engine import Camera, drift
+from dataclasses import replace
+from tests.fakedev import FakeDevice
 from briod.models import brio
 from tests.fakedev import fake_camera
 
@@ -10,6 +12,31 @@ class Apply(unittest.TestCase):
     def setUp(self):
         self.cam = fake_camera()
         self.dev = self.cam.dev
+
+    def test_mx_brio_standard_controls_only(self):
+        cam = Camera(replace(self.cam.info, pid="0944", name="MX Brio"), device_cls=FakeDevice)
+        self.assertIn("0944", brio.PIDS)
+        caps = cam.capabilities()
+        for name in ("fov", "mic", "backlight_compensation"):
+            self.assertNotIn(name, caps)
+        self.assertEqual(cam.firmware, "")
+        errors = cam.apply(brio.DEFAULT_SETTINGS, device_settings={"microphone": False})
+        self.assertEqual(errors, [])
+        names = [name for name, value in cam.dev.log]
+        self.assertIn("zoom_absolute", names)
+        self.assertIn("focus_automatic_continuous", names)
+        for name in ("fov", "mic", "backlight_compensation"):
+            self.assertNotIn(name, names)
+
+    def test_mx_brio_prefers_raw_preview(self):
+        cam = Camera(replace(self.cam.info, pid="0944"), device_cls=FakeDevice)
+        import copy
+        raw = copy.deepcopy(next(f for f in cam.formats if f["fourcc"] == "MJPG"))
+        raw["fourcc"] = "YUYV"
+        cam.formats.append(raw)
+        self.assertTrue(cam.resolutions())
+        self.assertTrue(all(r["fourcc"] == "YUYV" for r in cam.resolutions()))
+        self.assertTrue(all(r["fourcc"] == "MJPG" for r in self.cam.resolutions()))
 
     def test_capabilities_and_firmware(self):
         caps = self.cam.capabilities()

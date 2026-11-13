@@ -435,7 +435,7 @@ class CameraInfo:
         return f"brio.{self.serial or self.usb_path.rsplit('/', 1)[-1]}"
 
 
-def find_cameras(vid="046d", pids=("085e",)) -> list[CameraInfo]:
+def find_cameras(vid="046d", pids=("085e", "0944")) -> list[CameraInfo]:
     """All matching cameras; the primary node is the lowest-numbered capture node
     that offers MJPEG (the BRIO's second capture node is the IR sensor)."""
     groups: dict[str, list[str]] = {}

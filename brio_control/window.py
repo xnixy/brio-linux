@@ -228,7 +228,7 @@ class Window(Adw.ApplicationWindow):
         dev = self.dev()
         want = (dev is not None and self.preview_wanted and
                 (self.is_active() or not dev["deviceSettings"].get("stopVideoOnAppFocusLoss", True)))
-        if want and not self.preview.running:
+        if want and not self.preview.running and not self.preview.failed:
             users = [c["name"] for c in dev.get("consumers", [])]
             self.client.register_preview(self.slot, True)
             self.preview.start()
@@ -263,6 +263,7 @@ class Window(Adw.ApplicationWindow):
         elif key == "grid":
             self.preview.grid.set_visible(value)
         elif key == "preview":
+            self.preview.failed = False
             self.preview_wanted = value
             self._sync_preview()
         self.client.set_device_setting(self.slot, f"preview.{key}", value)

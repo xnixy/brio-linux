@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 
-VID, PIDS = "046d", ("085e",)
+VID, PIDS = "046d", ("085e", "0944")
 MODEL = "brio"
 DISPLAY_NAME = "Logitech BRIO"
 

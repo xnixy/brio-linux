@@ -66,10 +66,13 @@ class Preview(Gtk.Overlay):
         self.mode = None
         self.mirror = False
         self.running = False
+        self.failed = False
         self.show_message("Preview off")
 
     # ---------------------------------------------------------------- public
     def configure(self, devnode, mode: dict | None, mirror: bool, grid: bool):
+        if devnode != self.devnode or mode != self.mode:
+            self.failed = False
         restart = self.running and (devnode != self.devnode or mode != self.mode)
         self.devnode, self.mode = devnode, mode
         self.set_mirror(mirror)
@@ -175,6 +178,7 @@ class Preview(Gtk.Overlay):
         text = err.message
         if dbg and ("busy" in dbg.lower() or "EBUSY" in dbg):
             text = "busy"
+        self.failed = True
         self.stop()
         self.emit("state", "error", text)
 
